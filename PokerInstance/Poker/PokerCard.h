@@ -4,7 +4,8 @@
 
 class cPokerCard : public phevaluator::Card
 {
-
+public:
+	std::array<float, 2> FloatEncoding();
 };
 
 #endif

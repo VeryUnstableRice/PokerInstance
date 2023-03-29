@@ -57,9 +57,9 @@ public:
 
   Card(const char name[]) : Card(std::string(name)) {}
 
-  char describeRank(void) const { return rankReverseArray[id_ & 3]; }
+  char describeRank(void) const { return rankReverseArray[id_ >> 2]; }
 
-  char describeSuit(void) const { return suitReverseArray[id_ >> 2]; }
+  char describeSuit(void) const { return suitReverseArray[id_ & 3]; }
 
   std::string describeCard(void) const {
     return std::string{ describeRank(), describeSuit() };

@@ -5,7 +5,7 @@
 cmake_minimum_required (VERSION 3.8)
 
 # Add source to this project's executable.
-add_executable (PokerInstance "main.cpp" "Poker/PokerInstance.cpp" "Poker/AbstractPokerPlayer.cpp" "Poker/PokerCard.h")
+add_executable (PokerInstance "main.cpp" "Poker/PokerInstance.cpp" "Poker/AbstractPokerPlayer.cpp" "Poker/PokerCard.h" "Poker/PokerDeck.h" "Poker/PokerDeck.cpp")
 
 if (CMAKE_VERSION VERSION_GREATER 3.12)
   set_property(TARGET PokerInstance PROPERTY CXX_STANDARD 20)
