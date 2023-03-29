@@ -1,7 +1,4 @@
-﻿# CMakeList.txt : Top-level CMake project file, do global configuration
-# and include sub-projects here.
-#
-cmake_minimum_required (VERSION 3.8)
+﻿cmake_minimum_required (VERSION 3.8)
 
 # Enable Hot Reload for MSVC compilers if supported.
 if (POLICY CMP0141)
@@ -11,10 +8,17 @@ endif()
 
 project ("PokerInstance")
 
-add_subdirectory(extern/PokerHandEvaluator)
+# Set the include and library directories
+set(WIN_INCLUDE_DIR "${CMAKE_SOURCE_DIR}/libraries/windows/include")
 
-target_include_directories(your_project_target PRIVATE extern/PokerHandEvaluator/include)
+# Set the library file depending on the build configuration
+set(PHEVAL_LIB_DIR "${CMAKE_SOURCE_DIR}/libraries/windows/lib")
+set(PHEVAL_LIB_DEBUG "${PHEVAL_LIB_DIR}/Debug/pheval.lib")
+set(PHEVAL_LIB_RELEASE "${PHEVAL_LIB_DIR}/Release/pheval.lib")
 
-target_link_libraries(your_project_target PRIVATE PokerHandEvaluator)
+# Include the phevaluator include directory
+include_directories(${WIN_INCLUDE_DIR})
+
 # Include sub-projects.
 add_subdirectory ("PokerInstance")
+# PokerInstance/CMakeLists.

@@ -1,7 +1,6 @@
+#include <phevaluator/phevaluator.h>
 #include <iostream>
 #include <cassert>
-#include "../extern/PokerHandEvaluator/cpp/include/phevaluator/rank.h"
-#include "../extern/PokerHandEvaluator/cpp/include/phevaluator/phevaluator.h"
 
 int main()
 {
