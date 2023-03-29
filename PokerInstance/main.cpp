@@ -5,8 +5,6 @@
 
 int main()
 {
-	cPokerInstance instance;
-	instance.InitTestPlayers();
-	instance.DealCards();
+	cPokerInstance instance(1, 2);
 	instance.PrintPlayersAndRanks();
 }

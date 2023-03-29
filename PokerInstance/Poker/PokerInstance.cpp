@@ -3,6 +3,21 @@
 #include <algorithm>
 #include <iostream>
 
+void cPokerInstance::Reset()
+{
+	m_state = ePokerInstanceState::Initialize;
+	InitTestPlayers();
+	m_running = true;
+}
+
+cPokerInstance::cPokerInstance(std::uint32_t min_stake, std::uint32_t max_stake)
+{
+	m_minStake = min_stake;
+	m_maxStake = max_stake;
+	m_dealerButton = 0;
+	Reset();
+}
+
 void cPokerInstance::DealCards()
 {
 	m_deck.Shuffle();
@@ -55,4 +70,42 @@ void cPokerInstance::InitTestPlayers()
 	m_players.resize(10);
 	for (int i = 0; i < 10; ++i)
 		m_players[i] = std::make_shared< cAbstractPokerPlayer>();
+}
+
+void cPokerInstance::Run()
+{
+	while (m_running)
+	{
+		switch (m_state)
+		{
+		case ePokerInstanceState::Initialize:
+			State_Initialize();
+			break;
+		case ePokerInstanceState::Pre_Flop:
+			State_PreFlop();
+			break;
+		}
+	}
+}
+
+void cPokerInstance::State_Initialize()
+{
+	size_t player_num = m_players.size();
+	m_dealerButton = (m_dealerButton + 1) % player_num;
+	m_smallBlind = m_dealerButton - 1;
+	m_bigBlind = m_dealerButton - 2;
+
+	if (m_smallBlind < 0)
+		m_smallBlind += player_num;
+	if (m_bigBlind < 0)
+		m_bigBlind += player_num;
+
+
+	DealCards();
+}
+
+void cPokerInstance::State_PreFlop()
+{
+	m_players[m_smallBlind]->SetCurrentBet(m_minStake);
+	m_players[m_bigBlind]->SetCurrentBet(m_maxStake);
 }
