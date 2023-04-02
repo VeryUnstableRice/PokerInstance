@@ -6,5 +6,6 @@
 int main()
 {
 	cPokerInstance instance(1, 2);
+	instance.Run();
 	instance.PrintPlayersAndRanks();
 }

@@ -28,13 +28,26 @@ class cPokerInstance
 	std::uint32_t m_smallBlind, m_bigBlind;
 	std::uint32_t m_dealerButton;
 	bool m_running;
+	bool m_noBetsYet;
 
 	ePokerInstanceState m_state;
 
+	bool AllPlayersActed() const;
+	bool AllPlayersBetsEqualOrAllIn() const;
+	bool CanProceedToNextStage() const;
+	
+	void LetPlayersAct();
+	
 	void Reset();
 
+	void DealCommunityCards(std::uint8_t amount = 1);
+	void DealCardsToPlayer();
+
+	//initialize part
 	void State_Initialize();
 	void State_PreFlop();
+	void State_Flop();
+	void State_River();
 
 public:
 	cPokerInstance(std::uint32_t min_stake, std::uint32_t max_stake);
@@ -42,8 +55,6 @@ public:
 	void Run();
 
 
-	//we use this to shuffle the deck and deal the cards to the community and players;
-	void DealCards();
 	//this sorts players by ranks, the first player is always the winner
 	std::vector<RankAndPlayerIndex> GetRanksAndPlayers();
 	//get player rank
