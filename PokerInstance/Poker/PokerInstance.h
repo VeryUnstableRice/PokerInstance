@@ -27,6 +27,8 @@ class cPokerInstance
 	std::uint32_t m_minStake, m_maxStake;
 	std::uint32_t m_smallBlind, m_bigBlind;
 	std::uint32_t m_dealerButton;
+	std::uint32_t m_pot;
+
 	bool m_running;
 	bool m_noBetsYet;
 
@@ -37,17 +39,19 @@ class cPokerInstance
 	bool CanProceedToNextStage() const;
 	
 	void LetPlayersAct();
-	
+	void AddBetsToPot();
+
 	void Reset();
 
 	void DealCommunityCards(std::uint8_t amount = 1);
-	void DealCardsToPlayer();
+	void DealCardsToPlayers();
+
+	void ProceedToNextStage(ePokerInstanceState nextState);
+	void SetBlinds();
 
 	//initialize part
 	void State_Initialize();
-	void State_PreFlop();
-	void State_Flop();
-	void State_River();
+	void State_Showdown();
 
 public:
 	cPokerInstance(std::uint32_t min_stake, std::uint32_t max_stake);

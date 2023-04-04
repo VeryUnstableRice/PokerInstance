@@ -16,6 +16,7 @@ cPokerInstance::cPokerInstance(std::uint32_t min_stake, std::uint32_t max_stake)
 	m_minStake = min_stake;
 	m_maxStake = max_stake;
 	m_dealerButton = 0;
+	m_pot = 0;
 	InitTestPlayers();
 	Reset();
 }
@@ -26,7 +27,9 @@ std::vector<RankAndPlayerIndex> cPokerInstance::GetRanksAndPlayers()
 	output.reserve(m_players.size());
 
 	for (int i = 0; i < m_players.size(); ++i)
-		output.push_back(std::make_pair(GetPlayerRank(m_players[i].get()), i));
+		if(m_players[i]->IsFolded())
+			output.push_back(std::make_pair(GetPlayerRank(m_players[i].get()), i));
+
 	std::sort(output.begin(), output.end(), [](const RankAndPlayerIndex& A, const RankAndPlayerIndex& B)
 		{
 			return A.first > B.first;
@@ -74,13 +77,17 @@ void cPokerInstance::Run()
 			State_Initialize();
 			break;
 		case ePokerInstanceState::Pre_Flop:
-			State_PreFlop();
+			SetBlinds();
+			ProceedToNextStage(ePokerInstanceState::Flop);
 			break;
 		case ePokerInstanceState::Flop:
-			State_Flop();
+			ProceedToNextStage(ePokerInstanceState::River);
 			break;
 		case ePokerInstanceState::River:
-			State_River();
+			ProceedToNextStage(ePokerInstanceState::Showdown);
+			break;
+		case ePokerInstanceState::Showdown:
+			State_Showdown();
 			break;
 		}
 	}
@@ -94,7 +101,7 @@ void cPokerInstance::State_Initialize()
 	m_bigBlind = (m_dealerButton - 2) % player_num;
 
 
-	DealCardsToPlayer();
+	DealCardsToPlayers(); 
 
 	m_state = ePokerInstanceState::Pre_Flop;
 }
@@ -113,7 +120,7 @@ void cPokerInstance::DealCommunityCards(std::uint8_t amount)
 	}
 }
 
-void cPokerInstance::DealCardsToPlayer()
+void cPokerInstance::DealCardsToPlayers()
 {
 	for (auto& player : m_players)
 	{
@@ -121,37 +128,32 @@ void cPokerInstance::DealCardsToPlayer()
 	}
 }
 
-void cPokerInstance::State_PreFlop()
+void cPokerInstance::SetBlinds()
 {
 	m_players[m_smallBlind]->SetCurrentBet(m_minStake);
 	m_players[m_bigBlind]->SetCurrentBet(std::min(m_maxStake, m_players[m_bigBlind]->GetStackSize()));
-
-	LetPlayersAct();
-	if (CanProceedToNextStage())
-	{
-		DealCommunityCards(3);
-		m_state = ePokerInstanceState::Flop;
-	}
 }
 
-void cPokerInstance::State_Flop()
+void cPokerInstance::ProceedToNextStage(ePokerInstanceState nextState)
 {
 	LetPlayersAct();
 	if (CanProceedToNextStage())
 	{
-		DealCommunityCards();
-		m_state = ePokerInstanceState::River;
+		if (nextState == ePokerInstanceState::Flop) {
+			DealCommunityCards(3);
+		}
+		else {
+			DealCommunityCards();
+		}
+		AddBetsToPot();
+		m_state = nextState;
 	}
 }
 
-void cPokerInstance::State_River()
+void cPokerInstance::State_Showdown()
 {
-	LetPlayersAct();
-	if (CanProceedToNextStage())
-	{
-		DealCommunityCards();
-		m_state = ePokerInstanceState::River;
-	}
+	std::vector<RankAndPlayerIndex> sorted_players = GetRanksAndPlayers();
+	//TODO: IMPLEMENT
 }
 
 bool cPokerInstance::AllPlayersActed() const
@@ -250,5 +252,15 @@ void cPokerInstance::LetPlayersAct()
 			break;
 		}
 		}
+	}
+}
+
+void cPokerInstance::AddBetsToPot()
+{
+	for (auto& player : m_players)
+	{
+		std::uint32_t current_bet = player->GetCurrentBet();
+		player->SetCurrentBet(0);
+		m_pot += current_bet;
 	}
 }
